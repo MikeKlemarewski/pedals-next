@@ -63,7 +63,7 @@ const Navigation = ({ children } : Props) => {
       </Drawer>
 
       {/* Empty toolbar used to offset the page content so it is not hidden by the main toolbar */}
-      <Box>
+      <Box sx={{ width: 1 }}>
         <Toolbar variant="dense" />
         {children}
       </Box>
