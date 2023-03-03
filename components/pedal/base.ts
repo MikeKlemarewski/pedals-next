@@ -1,22 +1,7 @@
-import { Cord } from "components/patchCord";
+import PatchCable from "components/patchCable";
 
 const height = 200;
 const width = 100;
-
-export interface Pedal {
-  x: number;
-  y: number;
-  color: string;
-  draw(ctx: CanvasRenderingContext2D): void;
-  inputCord: Cord | null;
-  outputCord: Cord | null;
-  audioNode: AudioNode;
-  getAudioNode(): AudioNode;
-  getRightEdgeX(): number;
-  getLeftEdgeX(): number;
-  unplugInputCord(): void;
-  unplugOutputCord(): void;
-}
 
 interface constructorArgs {
   x: number;
@@ -25,12 +10,12 @@ interface constructorArgs {
   audioCtx: AudioContext;
 }
 
-export default class BasePedal implements Pedal {
+export default class BasePedal {
   x: number;
   y: number;
   color: string;
-  inputCord: Cord | null;
-  outputCord: Cord | null;
+  inputCable: PatchCable | null;
+  outputCable: PatchCable | null;
   audioNode: AudioNode;
 
   constructor({
@@ -43,8 +28,8 @@ export default class BasePedal implements Pedal {
     this.y = y;
     this.color = color;
 
-    this.inputCord = null;
-    this.outputCord = null;
+    this.inputCable = null;
+    this.outputCable = null;
 
     this.audioNode = this.setupAudioNode(audioCtx);
   }
@@ -74,23 +59,23 @@ export default class BasePedal implements Pedal {
   }
 
   getNextPedal() {
-    return this.outputCord ? this.outputCord.getOutputPedal() : null;
+    return this.outputCable ? this.outputCable.getOutputPedal() : null;
   }
 
   getPreviousPedal() {
-    return this.inputCord ? this.inputCord.getInputPedal() : null;
+    return this.inputCable ? this.inputCable.getInputPedal() : null;
   }
 
   move(x: number, y: number) {
     this.x += x;
     this.y += y;
 
-    if (this.inputCord) {
-      this.inputCord.moveRightSide(x, y);
+    if (this.inputCable) {
+      this.inputCable.moveRightSide(x, y);
     }
 
-    if (this.outputCord) {
-      this.outputCord.moveLeftSide(x, y);
+    if (this.outputCable) {
+      this.outputCable.moveLeftSide(x, y);
     }
   }
 
@@ -106,8 +91,8 @@ export default class BasePedal implements Pedal {
     return true;
   }
 
-  plugInInputCord(cord: Cord) {
-    this.inputCord = cord;
+  plugInInputCable(Cable: PatchCable) {
+    this.inputCable = Cable;
 
     const previousPedal = this.getPreviousPedal();
     if (previousPedal) {
@@ -116,8 +101,8 @@ export default class BasePedal implements Pedal {
     }
   }
 
-  plugInOutputCord(cord: Cord) {
-    this.outputCord = cord;
+  plugInOutputCable(Cable: PatchCable) {
+    this.outputCable = Cable;
 
     const nextPedal = this.getNextPedal();
     if (nextPedal) {
@@ -125,23 +110,23 @@ export default class BasePedal implements Pedal {
     }
   }
 
-  unplugInputCord() {
+  unplugInputCable() {
     const previousPedal = this.getPreviousPedal();
     if (previousPedal) {
       const previousAudioNode = previousPedal.getAudioNode();
       previousAudioNode.disconnect();
     }
 
-    this.inputCord = null;
+    this.inputCable = null;
   }
 
-  unplugOutputCord() {
+  unplugOutputCable() {
     const nextPedal = this.getNextPedal();
     if (nextPedal) {
       this.audioNode.disconnect();
     }
 
-    this.outputCord = null;
+    this.outputCable = null;
   }
 
   draw(ctx : CanvasRenderingContext2D) {

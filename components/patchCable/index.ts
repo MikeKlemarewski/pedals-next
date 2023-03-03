@@ -1,5 +1,4 @@
-import { Pedal } from 'components/pedal/base';
-import { LargeNumberLike } from 'crypto';
+import Pedal from 'components/pedal/base';
 
 const caseHeight = 15;
 const caseWidth = 50;
@@ -9,21 +8,7 @@ const contactWidth = caseWidth * ( 2 / 3 );
 
 type side = 'left' | 'right';
 
-export interface Cord {
-  x1: number;
-  x2: number;
-  y1: number;
-  y2: number;
-  sideToMove: side | null;
-  inputPedal: Pedal | null;
-  outputPedal: Pedal | null;
-  getInputPedal(): Pedal | null;
-  getOutputPedal(): Pedal | null;
-  moveLeftSide(x: number, y: number): void;
-  moveRightSide(x: number, y: number): void;
-}
-
-class PatchCord implements PatchCord {
+class PatchCable {
   x1: number;
   x2: number;
   y1: number;
@@ -32,7 +17,7 @@ class PatchCord implements PatchCord {
   inputPedal: Pedal | null;
   outputPedal: Pedal | null;
 
-  constructor(x, y) {
+  constructor(x: number, y: number) {
     this.x1 = x;
     this.y1 = y;
 
@@ -114,7 +99,7 @@ class PatchCord implements PatchCord {
 
   unplugLeftSide() {
     if (this.inputPedal) {
-      this.inputPedal.unplugOutputCord();
+      this.inputPedal.unplugOutputCable();
     }
 
     this.inputPedal = null;
@@ -122,7 +107,7 @@ class PatchCord implements PatchCord {
 
   unplugRightSide() {
     if (this.outputPedal) {
-      this.outputPedal.unplugInputCord();
+      this.outputPedal.unplugInputCable();
     }
 
     this.outputPedal = null;
@@ -179,24 +164,24 @@ class PatchCord implements PatchCord {
       contactHeight
     );
 
-    const cordStartX = this.x1 + contactWidth + caseWidth;
-    const cordStartY = this.y1 + ( 0.5 * contactHeight );
-    const cordEndX = this.x2;
-    const cordEndY = this.y2 + ( 0.5 * caseHeight );
+    const CableStartX = this.x1 + contactWidth + caseWidth;
+    const CableStartY = this.y1 + ( 0.5 * contactHeight );
+    const CableEndX = this.x2;
+    const CableEndY = this.y2 + ( 0.5 * caseHeight );
 
-    const cp1X = cordStartX + ( (cordEndX - cordStartX) * (1 / 3) );
-    const cp1Y = cordStartY;
-    const cp2X = cordStartX + ( (cordEndX - cordStartX) * (2 / 3) );
-    const cp2Y = cordEndY;
+    const cp1X = CableStartX + ( (CableEndX - CableStartX) * (1 / 3) );
+    const cp1Y = CableStartY;
+    const cp2X = CableStartX + ( (CableEndX - CableStartX) * (2 / 3) );
+    const cp2Y = CableEndY;
 
     ctx.fillStyle = '#000';
     ctx.beginPath();
-    ctx.moveTo(cordStartX, cordStartY);
-    ctx.bezierCurveTo(cp1X, cp1Y, cp2X, cp2Y, cordEndX , cordEndY);
+    ctx.moveTo(CableStartX, CableStartY);
+    ctx.bezierCurveTo(cp1X, cp1Y, cp2X, cp2Y, CableEndX , CableEndY);
     ctx.stroke();
 
     ctx.fillStyle = previousFillStyle;
   }
 }
 
-export default PatchCord;
+export default PatchCable;
