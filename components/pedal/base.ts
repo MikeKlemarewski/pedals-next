@@ -6,7 +6,7 @@ const width = 100;
 interface constructorArgs {
   x: number;
   y: number;
-  color: string;
+  color?: string;
   audioCtx: AudioContext;
 }
 
@@ -35,7 +35,7 @@ export default class BasePedal {
   }
 
   setupAudioNode(audioCtx : AudioContext) {
-    return audioCtx.createGain();
+    return audioCtx.createGain() as AudioNode;
   }
 
   getAudioNode() {

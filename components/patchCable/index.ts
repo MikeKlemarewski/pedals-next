@@ -6,14 +6,14 @@ const caseWidth = 50;
 const contactHeight = caseHeight / 2;
 const contactWidth = caseWidth * ( 2 / 3 );
 
-type side = 'left' | 'right';
+export type cableSide = 'left' | 'right';
 
 class PatchCable {
   x1: number;
   x2: number;
   y1: number;
   y2: number;
-  sideToMove: side | null;
+  sideToMove: cableSide | null;
   inputPedal: Pedal | null;
   outputPedal: Pedal | null;
 
