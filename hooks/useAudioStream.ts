@@ -1,0 +1,40 @@
+import { useEffect, useRef, useState } from "react";
+
+const useAudioStream = (audioCtx: AudioContext | null, audioInputDeviceId: string | undefined) => {
+  const stream = useRef<MediaStream | null>(null);
+  const [streamNode, setStreamNode] = useState<MediaStreamAudioSourceNode | null>(null);
+
+
+  useEffect(() => {
+    if (stream.current) {
+      stream.current.getAudioTracks()[0].stop();
+    }
+
+    const constraints = {
+      audio: {
+        deviceId: audioInputDeviceId ? { exact: audioInputDeviceId } : undefined,
+        autoGainControl: false,
+        echoCancellation: false,
+        noiseSuppression: false,
+        latency: 0.02,
+      }
+    };
+
+    navigator.mediaDevices.getUserMedia(constraints).then(s => {
+      stream.current = s;
+
+      if (!audioCtx) {
+        return;
+      }
+
+      streamNode?.disconnect();
+
+      setStreamNode(audioCtx.createMediaStreamSource(stream.current));
+    });
+  }, [audioCtx, audioInputDeviceId]);
+
+
+  return streamNode;
+}
+
+export default useAudioStream;

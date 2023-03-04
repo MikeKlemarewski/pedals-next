@@ -8,6 +8,7 @@ interface constructorArgs {
   y: number;
   color?: string;
   audioCtx: AudioContext;
+  audioNode?: AudioNode;
 }
 
 export default class BasePedal {
@@ -23,6 +24,7 @@ export default class BasePedal {
     y,
     color = `#${Math.floor(Math.random()*16777215).toString(16)}`,
     audioCtx,
+    audioNode,
   } : constructorArgs) {
     this.x = x;
     this.y = y;
@@ -31,7 +33,7 @@ export default class BasePedal {
     this.inputCable = null;
     this.outputCable = null;
 
-    this.audioNode = this.setupAudioNode(audioCtx);
+    this.audioNode = audioNode || this.setupAudioNode(audioCtx);
   }
 
   setupAudioNode(audioCtx : AudioContext) {

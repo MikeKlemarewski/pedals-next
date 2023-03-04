@@ -88,6 +88,8 @@ class PatchCable {
 
     this.inputPedal = pedal;
     this.move(-pedalDeltaX, 0);
+
+    pedal.plugInOutputCable(this);
   }
 
   plugRightSideIntoPedal(pedal: Pedal) {
@@ -95,6 +97,8 @@ class PatchCable {
 
     this.outputPedal = pedal;
     this.move(-pedalDeltaX, 0);
+
+    pedal.plugInInputCable(this);
   }
 
   unplugLeftSide() {

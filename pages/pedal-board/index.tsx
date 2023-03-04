@@ -1,19 +1,24 @@
 import { PlayArrow } from "@mui/icons-material";
 import { Box, Button } from "@mui/material";
+import AudioInputPicker from "components/audioInputPicker";
 import PatchCable from "components/patchCable";
 import Pedal from "components/pedal/base";
 import DistortionPedal from "components/pedal/distortion";
-import OscillatorPedal from "components/pedal/oscillator";
 import OutputPedal from "components/pedal/output";
 import VolumePedal from "components/pedal/volume";
 import PedalBoardCanvas from "components/pedalBoardCanvas";
+import useAudioStream from "hooks/useAudioStream";
 import { useCallback, useEffect, useState } from "react";
 
 export default function PedalBoard() {
 
   const [audioCtx, setAudioCtx] = useState<AudioContext | null>(null);
+  const [selectedInput, setSelectedInput] = useState<MediaDeviceInfo | null>(null);
   const [pedals, setPedals] = useState<Pedal[]>([]);
   const [cables, setCables] = useState<PatchCable[]>([]);
+  const [inputPedal, setInputPedal] = useState<Pedal | null>(null);
+
+  const streamNode = useAudioStream(audioCtx, selectedInput?.deviceId);
 
   useEffect(() => {
       // @ts-ignore
@@ -23,7 +28,6 @@ export default function PedalBoard() {
     audioCtx.suspend();
 
     setPedals([
-      new OscillatorPedal({ x: 10, y: 10, audioCtx, color: "#AAAAAA" }),
       new VolumePedal({ x: 200, y: 10, audioCtx }),
       new DistortionPedal({ x: 400, y: 10, audioCtx }),
       new OutputPedal({ x: 600, y: 10, audioCtx, color: "#444444" }),
@@ -38,10 +42,30 @@ export default function PedalBoard() {
     setAudioCtx(audioCtx);
   }, [])
 
+  useEffect(() => {
+    if (!audioCtx || !streamNode) {
+      return;
+    }
+
+    const newInputPedal = new Pedal({ x: 10, y: 10, audioCtx, audioNode: streamNode });
+
+    if (inputPedal && inputPedal.outputCable) {
+      const outputCable = inputPedal.outputCable;
+
+      outputCable.unplugLeftSide();
+      outputCable.plugLeftSideIntoPedal(newInputPedal);
+    }
+
+    setInputPedal(newInputPedal);
+    setPedals([newInputPedal, ...pedals.filter(p => p !== inputPedal)])
+  }, [audioCtx, streamNode])
+
   const handlePlayClick = useCallback(() => {
     if (!audioCtx) {
       return;
     }
+
+    console.log({ base: audioCtx.baseLatency, output: audioCtx.outputLatency })
 
     if (audioCtx.state === 'running') {
       audioCtx.suspend();
@@ -61,7 +85,8 @@ export default function PedalBoard() {
       }}
     >
       <Box sx={{
-        my: 1,
+        mt: 2,
+        mb: 1,
         mx: 1,
       }}>
         <Button
@@ -71,6 +96,10 @@ export default function PedalBoard() {
         >
           Play
         </Button>
+        <AudioInputPicker
+          selectedInput={selectedInput}
+          onChange={setSelectedInput}
+        />
       </Box>
       <Box
         sx={{

@@ -1,7 +1,7 @@
 import PatchCable, { cableSide } from 'components/patchCable';
 import Pedal from 'components/pedal/base';
 import useWindowDimensions from 'hooks/useWindowDimensions';
-import React, { SyntheticEvent, useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 
 interface Props {
   cables: PatchCable[];
@@ -71,10 +71,8 @@ const PedalBoardCanvas = ({
     if (pedal) {
       if (direction === 'left') {
         patchCable.plugLeftSideIntoPedal(pedal);
-        pedal.plugInOutputCable(patchCable);
       } else {
         patchCable.plugRightSideIntoPedal(pedal);
-        pedal.plugInInputCable(patchCable);
       }
 
       draw();
@@ -138,7 +136,7 @@ const PedalBoardCanvas = ({
       style={{
         border: '1px dashed black',
         width: 'calc(100% - 16px)',
-        height: 'calc(100% - 16px)',
+        height: 'calc(100% - 24px)',
         margin: '8px',
       }}
       width={canvasRef.current?.offsetWidth}
