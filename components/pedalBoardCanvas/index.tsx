@@ -29,12 +29,12 @@ const PedalBoardCanvas = ({
       context.canvas.height
     );
 
-    pedals.forEach(pedal => {
-      pedal.draw(context);
-    });
-
     cables.forEach(cable => {
       cable.draw(context);
+    });
+
+    pedals.forEach(pedal => {
+      pedal.draw(context);
     });
   }, [cables, pedals])
 

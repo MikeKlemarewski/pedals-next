@@ -2,8 +2,16 @@ import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from "@m
 import { useEffect, useMemo, useState } from "react";
 
 interface Props {
-  onChange(audioInput: MediaDeviceInfo): void;
-  selectedInput?: MediaDeviceInfo | null;
+  onChange(audioInput: string): void;
+  selectedInput?: string;
+}
+
+export const keyboardMediaInfo: MediaDeviceInfo = {
+  deviceId: 'keyboard',
+  groupId: '-1',
+  kind: 'audioinput',
+  label: 'Keyboard',
+  toJSON: () => null,
 }
 
 const AudioInputPicker = ({
@@ -26,10 +34,12 @@ const AudioInputPicker = ({
         }
       });
 
+      audioInputs.push(keyboardMediaInfo);
+
       setInputs(audioInputs);
 
       if (!selectedInput) {
-        onChange(audioInputs[0]);
+        onChange(audioInputs[0].deviceId);
       }
     });
   }, []);
@@ -53,7 +63,7 @@ const AudioInputPicker = ({
     const input = inputs.find(input => input.deviceId === event.target.value);
 
     if (input) {
-      onChange(input);
+      onChange(input.deviceId);
     }
   }
 
@@ -70,7 +80,7 @@ const AudioInputPicker = ({
         labelId="audio-input-select"
         id="audio-input-select"
         label="Input"
-        value={selectedInput?.deviceId}
+        value={selectedInput}
         onChange={handleInputSelect}
       >
         {inputOptions}

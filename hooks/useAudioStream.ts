@@ -1,3 +1,4 @@
+import { keyboardMediaInfo } from "components/audioInputPicker";
 import { useEffect, useRef, useState } from "react";
 
 const useAudioStream = (audioCtx: AudioContext | null, audioInputDeviceId: string | undefined) => {
@@ -30,6 +31,13 @@ const useAudioStream = (audioCtx: AudioContext | null, audioInputDeviceId: strin
       streamNode?.disconnect();
 
       setStreamNode(audioCtx.createMediaStreamSource(stream.current));
+    }).catch(e => {
+      // This is our fake keyboard being slected. Ignore the error.
+      if (e instanceof OverconstrainedError && audioInputDeviceId === keyboardMediaInfo.deviceId) {
+        return;
+      }
+
+      throw e;
     });
   }, [audioCtx, audioInputDeviceId]);
 
