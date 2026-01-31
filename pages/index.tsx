@@ -1,5 +1,5 @@
 import PedalBoardCard from "components/pedalBoardCard"
-import Grid from '@mui/material/Unstable_Grid2';
+import Grid from '@mui/material/Grid';
 import NewPedalBoardCard from "components/newPedalBoardCard";
 import Divider from "@mui/material/Divider";
 import { Box } from "@mui/material";
@@ -21,7 +21,7 @@ export default function Home() {
       <Box sx={{ p: 2 }}>
         <Grid container spacing={2}>
           {stubBoards.map((board, i) => (
-            <Grid key={i} xs={4}>
+            <Grid key={i} size={{ xs: 4 }}>
               <PedalBoardCard
                 name={board.name}
                 description={board.description}

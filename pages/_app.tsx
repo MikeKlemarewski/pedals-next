@@ -1,5 +1,5 @@
 import 'styles/globals.css'
-import { Roboto_Flex } from '@next/font/google'
+import { Roboto_Flex } from 'next/font/google'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
 import { CssBaseline } from '@mui/material'
