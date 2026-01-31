@@ -24,24 +24,27 @@ const AudioInputPicker = ({
     navigator
       .mediaDevices
       .getUserMedia({ video: false, audio: true })
+      .then(stream => {
+        stream.getAudioTracks().forEach(t => t.stop());
+        return navigator.mediaDevices.enumerateDevices();
+      })
+      .then(devices => {
+        const audioInputs : MediaDeviceInfo[] = [];
 
-    navigator.mediaDevices.enumerateDevices().then(devices => {
-      const audioInputs : MediaDeviceInfo[] = [];
+        devices.forEach(device => {
+          if (device.kind === 'audioinput') {
+            audioInputs.push(device.toJSON())
+          }
+        });
 
-      devices.forEach(device => {
-        if (device.kind === 'audioinput') {
-          audioInputs.push(device.toJSON())
+        audioInputs.push(keyboardMediaInfo);
+
+        setInputs(audioInputs);
+
+        if (!selectedInput) {
+          onChange(audioInputs[0].deviceId);
         }
       });
-
-      audioInputs.push(keyboardMediaInfo);
-
-      setInputs(audioInputs);
-
-      if (!selectedInput) {
-        onChange(audioInputs[0].deviceId);
-      }
-    });
   }, []);
 
   const inputOptions = useMemo(() =>

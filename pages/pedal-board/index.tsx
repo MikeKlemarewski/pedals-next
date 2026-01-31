@@ -28,7 +28,7 @@ export default function PedalBoard() {
   useEffect(() => {
       // @ts-ignore
     const AudioContext = window.AudioContext || window.webkitAudioContext;
-    const audioCtx = new AudioContext();
+    const audioCtx = new AudioContext({ latencyHint: "interactive", sampleRate: 44100 });
 
     audioCtx.suspend();
 
@@ -46,6 +46,10 @@ export default function PedalBoard() {
     ])
 
     setAudioCtx(audioCtx);
+
+    return () => {
+      audioCtx.close();
+    };
   }, [])
 
   useEffect(() => {
