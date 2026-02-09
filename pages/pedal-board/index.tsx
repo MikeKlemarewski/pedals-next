@@ -36,7 +36,7 @@ export default function PedalBoard() {
       new OscillatorPedal({ x: 200, y: 10, audioCtx }),
       new VolumePedal({ x: 400, y: 10, audioCtx }),
       new DistortionPedal({ x: 600, y: 10, audioCtx }),
-      new OutputPedal({ x: 800, y: 10, audioCtx, color: "#444444" }),
+      new OutputPedal({ x: 800, y: 10, audioCtx }),
     ]);
 
     setCables([

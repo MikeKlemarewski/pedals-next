@@ -1,6 +1,10 @@
-import Pedal from "./base";
+import BasePedal from "./base";
 
-export default class DistortionPedal extends Pedal {
+export default class DistortionPedal extends BasePedal {
+  constructor(args: ConstructorParameters<typeof BasePedal>[0]) {
+    super({ ...args, color: '#C62828', label: 'DIST' });
+  }
+
   setupAudioNode(audioCtx: AudioContext) {
     const distortion = audioCtx.createWaveShaper();
 

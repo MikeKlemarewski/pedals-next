@@ -100,6 +100,14 @@ const PedalBoardCanvas = ({
   }, [draw, onMouseMove, plugPatchCableIntoNearestPedal]);
 
   const onMouseDown = useCallback((e: MouseEvent) => {
+    // Check if a stomp button was clicked
+    const stompedPedal = pedals.find(pedal => pedal.isStompButtonHit(e.offsetX, e.offsetY));
+    if (stompedPedal) {
+      stompedPedal.toggleBypass();
+      draw();
+      return;
+    }
+
     const pedalToMove = pedals.find(pedal => pedal.isInside(e.offsetX, e.offsetY));
     const cableToMove = cables.find(cable => cable.isInside(e.offsetX, e.offsetY));
 
@@ -116,7 +124,7 @@ const PedalBoardCanvas = ({
       document.addEventListener('mousemove', onMouseMove);
       document.addEventListener('mouseup', onMouseUp);
     }
-  }, [onMouseMove, onMouseUp, cables, pedals]);
+  }, [onMouseMove, onMouseUp, cables, pedals, draw]);
 
   useEffect(() => {
     document.addEventListener('mousedown', onMouseDown);
