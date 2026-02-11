@@ -14,6 +14,13 @@ const PedalBoardCanvas = ({
 } : Props) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const currentMovingRect = useRef<Pedal | PatchCable | null>(null);
+  const cablesRef = useRef(cables);
+  const pedalsRef = useRef(pedals);
+
+  useEffect(() => {
+    cablesRef.current = cables;
+    pedalsRef.current = pedals;
+  }, [cables, pedals]);
 
   const windowDimensions = useWindowDimensions();
 
@@ -29,14 +36,14 @@ const PedalBoardCanvas = ({
       context.canvas.height
     );
 
-    cables.forEach(cable => {
+    cablesRef.current.forEach(cable => {
       cable.draw(context);
     });
 
-    pedals.forEach(pedal => {
+    pedalsRef.current.forEach(pedal => {
       pedal.draw(context);
     });
-  }, [cables, pedals])
+  }, [])
 
   const getPedalToPlugInto = useCallback((x: number, y: number, side: cableSide) => {
     return pedals.find(pedal => {
@@ -182,6 +189,11 @@ const PedalBoardCanvas = ({
   }, [onCanvasMouseMove]);
 
   useEffect(() => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    }
     draw();
   }, [draw, cables, pedals, windowDimensions])
 
@@ -194,8 +206,6 @@ const PedalBoardCanvas = ({
         height: 'calc(100% - 24px)',
         margin: '8px',
       }}
-      width={canvasRef.current?.offsetWidth}
-      height={canvasRef.current?.offsetHeight}
     />
   )
 }

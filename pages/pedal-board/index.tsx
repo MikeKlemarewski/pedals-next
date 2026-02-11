@@ -9,6 +9,7 @@ import OscillatorPedal from "components/pedal/oscillator";
 import OutputPedal from "components/pedal/output";
 import VolumePedal from "components/pedal/volume";
 import PedalBoardCanvas from "components/pedalBoardCanvas";
+import PedalPalette from "components/pedalPalette";
 import useAudioStream from "hooks/useAudioStream";
 import useOscillator from "hooks/useOscillator";
 import { useCallback, useEffect, useState } from "react";
@@ -103,6 +104,30 @@ export default function PedalBoard() {
     setIsPlaying(true);
   }, [audioCtx]);
 
+  const addPedal = useCallback((pedalType: string) => {
+    if (!audioCtx) return;
+
+    const pedalCtors: Record<string, typeof Pedal> = {
+      oscillator: OscillatorPedal,
+      volume: VolumePedal,
+      distortion: DistortionPedal,
+      output: OutputPedal,
+    };
+
+    const Ctor = pedalCtors[pedalType];
+    if (!Ctor) return;
+
+    const offset = pedals.length * 30;
+    const newPedal = new Ctor({ x: 200 + offset, y: 10 + offset, audioCtx });
+    setPedals((prev) => [...prev, newPedal]);
+  }, [audioCtx, pedals.length]);
+
+  const addCable = useCallback(() => {
+    const offset = cables.length * 40;
+    const newCable = new PatchCable(100 + offset, 200 + offset);
+    setCables((prev) => [...prev, newCable]);
+  }, [cables.length]);
+
   return (
     <Box
       component="main"
@@ -143,11 +168,14 @@ export default function PedalBoard() {
       <Box
         sx={{
           display: 'flex',
-          alignItems: 'center',
           height: 1,
+          minHeight: 0,
         }}
       >
-        <PedalBoardCanvas pedals={pedals} cables={cables} />
+        <PedalPalette onSelect={addPedal} onAddCable={addCable} />
+        <Box sx={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+          <PedalBoardCanvas pedals={pedals} cables={cables} />
+        </Box>
       </Box>
     </Box>
   )
