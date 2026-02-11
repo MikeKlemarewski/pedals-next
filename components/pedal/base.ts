@@ -20,6 +20,7 @@ export default class BasePedal {
   inputCable: PatchCable | null;
   outputCable: PatchCable | null;
   audioNode: AudioNode;
+  bypassNode: GainNode;
   bypassed: boolean;
 
   constructor({
@@ -40,6 +41,7 @@ export default class BasePedal {
     this.bypassed = false;
 
     this.audioNode = audioNode || this.setupAudioNode(audioCtx);
+    this.bypassNode = audioCtx.createGain();
   }
 
   setupAudioNode(audioCtx : AudioContext) {
@@ -47,7 +49,7 @@ export default class BasePedal {
   }
 
   getAudioNode() {
-    return this.audioNode;
+    return this.bypassed ? this.bypassNode : this.audioNode;
   }
 
   getLeftEdgeX() {
@@ -155,7 +157,28 @@ export default class BasePedal {
   }
 
   toggleBypass() {
+    const previousPedal = this.getPreviousPedal();
+    const nextPedal = this.getNextPedal();
+
+    // Disconnect the currently active node
+    const oldNode = this.getAudioNode();
+    if (previousPedal) {
+      previousPedal.getAudioNode().disconnect(oldNode);
+    }
+    if (nextPedal) {
+      oldNode.disconnect(nextPedal.getAudioNode());
+    }
+
     this.bypassed = !this.bypassed;
+
+    // Reconnect through the new active node
+    const newNode = this.getAudioNode();
+    if (previousPedal) {
+      previousPedal.getAudioNode().connect(newNode);
+    }
+    if (nextPedal) {
+      newNode.connect(nextPedal.getAudioNode());
+    }
   }
 
   draw(ctx : CanvasRenderingContext2D) {
