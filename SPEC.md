@@ -11,43 +11,40 @@ and load their boards, and a home page that displays all saved pedalboards.
 
 ## 1. Visual Polish
 
-### 1.1 Pedal Appearance
+### 1.1 Pedal Appearance ✅
 
-**Current state:** Pedals render as plain colored rectangles via `BasePedal.draw()`.
-Colors are random unless explicitly passed.
+**Status: Done.**
 
-**Goal:** Pedals should look like miniature guitar pedals — a rounded rectangle
-body with a label, a consistent color per pedal type, and (when knobs are added
-in section 3) visible knobs on the face.
+Pedals now render as rounded rectangles with shadow/border for depth, bold white
+labels, and a designated color per pedal type (no more random colors). Each
+subclass passes its own color to `BasePedal`.
 
-**Design per pedal type:**
+**Implemented design per pedal type:**
 
 | Pedal Type   | Color   | Label        |
 |--------------|---------|--------------|
 | Oscillator   | #2196F3 | OSC          |
 | Volume       | #4CAF50 | VOL          |
-| Distortion   | #F44336 | DIST         |
+| Distortion   | #C62828 | DIST         |
 | Output       | #444444 | OUT          |
 | Reverb       | #9C27B0 | REVERB       |
 | Delay        | #FF9800 | DELAY        |
 | Chorus       | #00BCD4 | CHORUS       |
 | Flanger      | #E91E63 | FLANGER      |
 
-**Rendering details:**
+**What was built:**
 
-- Body: Rounded rectangle (corner radius ~10px) with a slight shadow or border
-  to give depth. Each pedal type uses its designated color from the table above.
-  The color should no longer be randomized — remove the random hex fallback in
-  `BasePedal`'s constructor and instead have each subclass pass its own color.
-- Stomp button: There should be a rectangular silver button at the bottom of the
-  pedal body. The button, when clicked, should make the signal bypass the effect
-  of the pedal, and continue to the next node in the audio graph.
-- Label: Pedal type name drawn in bold white text, centered horizontally on the
-  pedal face, positioned in the upper third of the body.
-- Footswitch: A small circle drawn at the bottom center of the pedal to visually
-  suggest the stomp switch (decorative only for now).
-- Size: Keep the current 100x200 dimensions. They can be adjusted later if knobs
-  need more room, but start here.
+- Body: Rounded rectangle (corner radius ~10px) with shadow and subtle border.
+  Each subclass passes its own color; random hex fallback removed.
+- Stomp button: Silver rectangular button at the bottom of the pedal. Clicking
+  it toggles bypass — the signal skips the effect and passes through to the
+  next node in the audio graph.
+- LED indicator: A small circle at the top center that glows red/orange when
+  active and goes dark when bypassed. Provides clear visual feedback for the
+  bypass state.
+- Label: Pedal type name in bold white text, centered horizontally on the pedal.
+- Size: 100x200 dimensions (exported as `PEDAL_WIDTH` / `PEDAL_HEIGHT`).
+- Cursor feedback: Grab/pointer cursors on hover for pedals and cables.
 
 ### 1.2 Patch Cable Appearance
 
@@ -266,6 +263,26 @@ Use `localStorage` for persistence. Keep it simple — no backend for now.
 - Add a "Save" button in the toolbar that serializes the current state and writes
   it to localStorage.
 - Add a name field (editable text or simple input) in the toolbar.
+
+### 4.5 Pedal Palette on Pedal Board Page
+
+**Status: Done.**
+
+The left-hand navigation on the pedal board page should list all available pedal
+types. Each entry shows the pedal's color swatch and name. Clicking an entry
+adds a new instance of that pedal to the board at a default position. The user
+can then drag it into place.
+
+| Pedal      | Color   |
+|------------|---------|
+| Oscillator | #2196F3 |
+| Volume     | #4CAF50 |
+| Distortion | #C62828 |
+| Reverb     | #9C27B0 |
+| Delay      | #FF9800 |
+| Chorus     | #00BCD4 |
+| Flanger    | #E91E63 |
+| Output     | #444444 |
 
 ---
 
