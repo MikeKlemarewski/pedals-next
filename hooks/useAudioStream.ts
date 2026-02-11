@@ -33,7 +33,7 @@ const useAudioStream = (audioCtx: AudioContext | null, audioInputDeviceId: strin
       setStreamNode(audioCtx.createMediaStreamSource(stream.current));
     }).catch(e => {
       // This is our fake keyboard being selected. Ignore the error.
-      if (e instanceof DOMException && e.name === 'OverconstrainedError' && audioInputDeviceId === keyboardMediaInfo.deviceId) {
+      if (e.name === 'OverconstrainedError' && audioInputDeviceId === keyboardMediaInfo.deviceId) {
         return;
       }
 
