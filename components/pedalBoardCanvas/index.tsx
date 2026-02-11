@@ -84,6 +84,11 @@ const PedalBoardCanvas = ({
       return;
     }
 
+    const canvas = canvasRef.current;
+    if (canvas) {
+      canvas.style.cursor = 'grabbing';
+    }
+
     currentMovingRect.current.move(e.movementX, e.movementY);
     draw();
   }, [draw]);
@@ -91,13 +96,44 @@ const PedalBoardCanvas = ({
   const onMouseUp = useCallback((e: MouseEvent) => {
     document.removeEventListener('mousemove', onMouseMove);
 
-    if (!(currentMovingRect.current instanceof PatchCable)) {
+    if (!currentMovingRect.current) return;
+
+    if (currentMovingRect.current instanceof PatchCable) {
+      plugPatchCableIntoNearestPedal(currentMovingRect.current);
+    }
+
+    currentMovingRect.current = null;
+
+    const canvas = canvasRef.current;
+    if (canvas) {
+      canvas.style.cursor = 'grab';
+    }
+
+    draw();
+  }, [draw, onMouseMove, plugPatchCableIntoNearestPedal]);
+
+  const onCanvasMouseMove = useCallback((e: MouseEvent) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    // Don't change cursor while dragging
+    if (currentMovingRect.current) return;
+
+    const isOverStompButton = pedals.some(pedal => pedal.isStompButtonHit(e.offsetX, e.offsetY));
+    if (isOverStompButton) {
+      canvas.style.cursor = 'pointer';
       return;
     }
 
-    plugPatchCableIntoNearestPedal(currentMovingRect.current);
-    draw();
-  }, [draw, onMouseMove, plugPatchCableIntoNearestPedal]);
+    const isOverPedal = pedals.some(pedal => pedal.isInside(e.offsetX, e.offsetY));
+    const isOverCable = cables.some(cable => cable.isInside(e.offsetX, e.offsetY));
+    if (isOverPedal || isOverCable) {
+      canvas.style.cursor = 'grab';
+      return;
+    }
+
+    canvas.style.cursor = 'default';
+  }, [pedals, cables]);
 
   const onMouseDown = useCallback((e: MouseEvent) => {
     // Check if a stomp button was clicked
@@ -133,6 +169,17 @@ const PedalBoardCanvas = ({
       document.removeEventListener('mousedown', onMouseDown);
     }
   }, [onMouseDown]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    canvas.addEventListener('mousemove', onCanvasMouseMove);
+
+    return () => {
+      canvas.removeEventListener('mousemove', onCanvasMouseMove);
+    }
+  }, [onCanvasMouseMove]);
 
   useEffect(() => {
     draw();
