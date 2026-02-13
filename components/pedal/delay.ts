@@ -10,14 +10,15 @@ export default class DelayPedal extends BasePedal {
   setupAudioNodes(audioCtx: AudioContext) {
     const inputGain = audioCtx.createGain();
 
-    const delay = audioCtx.createDelay(0.08);
+    const delay = audioCtx.createDelay();
+    delay.delayTime.value = 0.2;
     const feedback = audioCtx.createGain();
-    feedback.gain.value = 0.8;
+    feedback.gain.value = 0.4;
 
     inputGain.connect(delay);
     delay.connect(feedback);
     feedback.connect(delay);
 
-    return [inputGain, feedback, delay];
+    return [inputGain, delay];
   }
 }
