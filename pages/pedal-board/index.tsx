@@ -4,6 +4,7 @@ import AudioInputPicker, { keyboardMediaInfo } from "components/audioInputPicker
 import Keyboard from "components/keyboard";
 import PatchCable from "components/patchCable";
 import Pedal from "components/pedal/base";
+import DelayPedal from "components/pedal/delay";
 import DistortionPedal from "components/pedal/distortion";
 import OscillatorPedal from "components/pedal/oscillator";
 import OutputPedal from "components/pedal/output";
@@ -34,9 +35,6 @@ export default function PedalBoard() {
     audioCtx.suspend();
 
     setPedals([
-      new OscillatorPedal({ x: 200, y: 10, audioCtx }),
-      new VolumePedal({ x: 400, y: 10, audioCtx }),
-      new DistortionPedal({ x: 600, y: 10, audioCtx }),
       new OutputPedal({ x: 800, y: 10, audioCtx }),
     ]);
 
@@ -58,7 +56,7 @@ export default function PedalBoard() {
       return;
     }
 
-    const newInputPedal = new Pedal({ x: 10, y: 10, audioCtx, audioNode: oscillator });
+    const newInputPedal = new Pedal({ x: 10, y: 10, audioCtx, audioNodes: [oscillator] });
 
     if (inputPedal && inputPedal.outputCable) {
       const outputCable = inputPedal.outputCable;
@@ -69,14 +67,14 @@ export default function PedalBoard() {
 
     setPedals([newInputPedal, ...pedals.filter(p => p !== inputPedal)])
     setInputPedal(newInputPedal);
-  }, [oscillator, audioCtx, selectedInput])
+  }, [audioCtx, selectedInput])
 
   useEffect(() => {
     if (!audioCtx || !streamNode) {
       return;
     }
 
-    const newInputPedal = new Pedal({ x: 10, y: 10, audioCtx, audioNode: streamNode });
+    const newInputPedal = new Pedal({ x: 10, y: 10, audioCtx, audioNodes: [streamNode] });
 
     if (inputPedal && inputPedal.outputCable) {
       const outputCable = inputPedal.outputCable;
@@ -112,6 +110,7 @@ export default function PedalBoard() {
       volume: VolumePedal,
       distortion: DistortionPedal,
       output: OutputPedal,
+      delay: DelayPedal,
     };
 
     const Ctor = pedalCtors[pedalType];

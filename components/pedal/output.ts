@@ -5,7 +5,7 @@ export default class OutputPedal extends BasePedal {
     super({ ...args, color: '#444444', label: 'OUT' });
   }
 
-  setupAudioNode(audioCtx: AudioContext) {
-    return audioCtx.destination;
+  setupAudioNodes(audioCtx: AudioContext) {
+    return [audioCtx.destination];
   }
 }

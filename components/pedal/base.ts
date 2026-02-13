@@ -9,7 +9,7 @@ interface constructorArgs {
   color?: string;
   label?: string;
   audioCtx: AudioContext;
-  audioNode?: AudioNode;
+  audioNodes?: AudioNode[];
 }
 
 export default class BasePedal {
@@ -19,7 +19,7 @@ export default class BasePedal {
   label: string;
   inputCable: PatchCable | null;
   outputCable: PatchCable | null;
-  audioNode: AudioNode;
+  audioNodes: AudioNode[];
   bypassNode: GainNode;
   bypassed: boolean;
 
@@ -29,7 +29,7 @@ export default class BasePedal {
     color = '#888888',
     label = '',
     audioCtx,
-    audioNode,
+    audioNodes,
   } : constructorArgs) {
     this.x = x;
     this.y = y;
@@ -40,16 +40,20 @@ export default class BasePedal {
     this.outputCable = null;
     this.bypassed = false;
 
-    this.audioNode = audioNode || this.setupAudioNode(audioCtx);
+    this.audioNodes = audioNodes || this.setupAudioNodes(audioCtx);
     this.bypassNode = audioCtx.createGain();
   }
 
-  setupAudioNode(audioCtx : AudioContext) {
-    return audioCtx.createGain() as AudioNode;
+  setupAudioNodes(audioCtx : AudioContext) {
+    return [audioCtx.createGain()] as AudioNode[];
   }
 
-  getAudioNode() {
-    return this.bypassed ? this.bypassNode : this.audioNode;
+  getFirstAudioNode() {
+    return this.bypassed ? this.bypassNode : this.audioNodes[0];
+  }
+
+  getLastAudioNode() {
+    return this.bypassed ? this.bypassNode : this.audioNodes[this.audioNodes.length - 1];
   }
 
   getLeftEdgeX() {
@@ -106,8 +110,8 @@ export default class BasePedal {
 
     const previousPedal = this.getPreviousPedal();
     if (previousPedal) {
-      const previousAudioNode = previousPedal.getAudioNode();
-      previousAudioNode.connect(this.audioNode);
+      const previousAudioNode = previousPedal.getLastAudioNode();
+      previousAudioNode.connect(this.getFirstAudioNode());
     }
   }
 
@@ -116,15 +120,14 @@ export default class BasePedal {
 
     const nextPedal = this.getNextPedal();
     if (nextPedal) {
-      this.audioNode.connect(nextPedal.getAudioNode());
+      this.getLastAudioNode().connect(nextPedal.getFirstAudioNode());
     }
   }
 
   unplugInputCable() {
     const previousPedal = this.getPreviousPedal();
     if (previousPedal) {
-      const previousAudioNode = previousPedal.getAudioNode();
-      previousAudioNode.disconnect();
+      previousPedal.getLastAudioNode().disconnect(this.getFirstAudioNode());
     }
 
     this.inputCable = null;
@@ -133,7 +136,7 @@ export default class BasePedal {
   unplugOutputCable() {
     const nextPedal = this.getNextPedal();
     if (nextPedal) {
-      this.audioNode.disconnect();
+      this.getLastAudioNode().disconnect(nextPedal.getFirstAudioNode());
     }
 
     this.outputCable = null;
@@ -161,23 +164,21 @@ export default class BasePedal {
     const nextPedal = this.getNextPedal();
 
     // Disconnect the currently active node
-    const oldNode = this.getAudioNode();
     if (previousPedal) {
-      previousPedal.getAudioNode().disconnect(oldNode);
+      previousPedal.getLastAudioNode().disconnect(this.getFirstAudioNode());
     }
     if (nextPedal) {
-      oldNode.disconnect(nextPedal.getAudioNode());
+      this.getLastAudioNode().disconnect(nextPedal.getFirstAudioNode());
     }
 
     this.bypassed = !this.bypassed;
 
     // Reconnect through the new active node
-    const newNode = this.getAudioNode();
     if (previousPedal) {
-      previousPedal.getAudioNode().connect(newNode);
+      previousPedal.getLastAudioNode().connect(this.getFirstAudioNode());
     }
     if (nextPedal) {
-      newNode.connect(nextPedal.getAudioNode());
+      this.getLastAudioNode().connect(nextPedal.getFirstAudioNode());
     }
   }
 

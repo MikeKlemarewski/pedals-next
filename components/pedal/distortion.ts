@@ -4,8 +4,7 @@ export default class DistortionPedal extends BasePedal {
   constructor(args: ConstructorParameters<typeof BasePedal>[0]) {
     super({ ...args, color: '#C62828', label: 'DIST' });
   }
-
-  setupAudioNode(audioCtx: AudioContext) {
+  setupAudioNodes(audioCtx: AudioContext) {
     const distortion = audioCtx.createWaveShaper();
 
     function makeDistortionCurve(k: number = 50) {
@@ -22,6 +21,6 @@ export default class DistortionPedal extends BasePedal {
     };
 
     distortion.curve = makeDistortionCurve(400);
-    return distortion;
+    return [distortion];
   }
 }

@@ -1,5 +1,6 @@
 import { CableRounded } from "@mui/icons-material";
 import { Box, Divider, List, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
+import { COLOR as DELAY_COLOR } from "components/pedal/delay";
 
 export type PedalTypeEntry = {
   type: string;
@@ -12,6 +13,7 @@ export const pedalTypes: PedalTypeEntry[] = [
   { type: "volume", label: "Volume", color: "#4CAF50" },
   { type: "distortion", label: "Distortion", color: "#C62828" },
   { type: "output", label: "Output", color: "#444444" },
+  { type: "delay", label: "Delay", color: DELAY_COLOR },
 ];
 
 interface PedalPaletteProps {
